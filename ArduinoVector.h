@@ -1,18 +1,22 @@
 #ifndef _ARDUINO_VECTOR_H_
 #define _ARDUINO_VECTOR_H_
 
+#define VECTOR_SIZE_MAX_DEFAULT (64)
+
 template <typename T>
 class Vector
 {
-private:
+protected:
+    int mSizeMax;
     int mSize;
     T *mDataArr;
 
 public:
-    Vector()
+    Vector(int sizeMax = VECTOR_SIZE_MAX_DEFAULT)
     {
         mDataArr = nullptr;
         mSize = 0;
+        mSizeMax = sizeMax;
     }
 
     ~Vector()
@@ -22,11 +26,15 @@ public:
             delete[] mDataArr;
             mDataArr = nullptr;
         }
-        mSize = 0;
     }
 
     bool push_back(T value)
     {
+        if (mSize >= mSizeMax)
+        {
+            return false;
+        }
+
         int newSize = mSize + 1;
         T *newDataArr = new T[newSize];
         if (newDataArr == nullptr)
@@ -52,15 +60,7 @@ public:
 
     T at(int index)
     {
-        if (index >= 0 && index < mSize)
-        {
-            return mDataArr[index];
-        }
-        else
-        {
-            T value;
-            return value;
-        }
+        return mDataArr[index];
     }
 
     int size()
@@ -79,6 +79,7 @@ public:
             }
 
             this->mSize = other.mSize;
+            this->mSizeMax = other.mSizeMax;
             if (this->mSize > 0)
             {
                 this->mDataArr = new T[this->mSize];
